@@ -1,50 +1,77 @@
 <template>
-    <div>
-        <div class="controls">
-            <input v-model="team_url"> 
-            <input v-model="logo_url">
-            <button @click="getPlayers">Create badges!</button>
-            <div v-if="loading">Loading...</div>
-        </div>
-        <playerbadges :players="players" :logo_url="logo_url"></playerbadges>
-    </div>
+  <v-app>
+    <v-form ref="form" v-model="valid" class="controls">
+      <v-container>
+        <v-row>
+          <v-col cols="12" sm="12">
+            <v-text-field
+              v-model="team_url"
+              :rules="[v => !!v || 'URL is required']"
+              label="URL to chess team on https://schachbund.de"
+              required
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="12">
+            <v-text-field
+              v-model="logo_url"
+              :rules="[v => !!v || 'URL is required']"
+              label="URL to logo of the choosen chess team"
+              required
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-btn color="error" class="mr-4" @click="reset">Reset Form</v-btn>
+        <v-btn :disabled="!valid" color="success" class="mr-4" @click="getPlayers">Create badges!</v-btn>
+      </v-container>
+    </v-form>
+
+    <div v-if="loading">Loading...</div>
+    <playerbadges :players="players" :logo_url="logo_url"></playerbadges>
+  </v-app>
 </template>
 
 <script>
-import playerbadges from '~/components/playerbadges.vue';
+import playerbadges from "~/components/playerbadges.vue";
 
 export default {
-    components: {
-        playerbadges
+  components: {
+    playerbadges
+  },
+  methods: {
+    getPlayers() {
+      this.loading = false;
+      this.$axios
+        .post(`api/get-players`, { team_url: this.team_url })
+        .then(res => {
+          this.loading = false;
+          this.players = res.data;
+        });
     },
-    methods: {
-        getPlayers() {
-            this.loading = true;
-            this.$axios.post(`api/get-players`,{ team_url: this.team_url }).then(res => {
-                this.loading = false;
-                this.players = res.data
-            })
-        }
-    },
-    data() {
-        return {
-            players: [],
-            loading: false,
-            team_url: 'https://www.schachbund.de/SchachBL/bedm.php?liga=olob&nummer=6',
-            logo_url: 'http://www.schachfreunde-neuberg.de/SFR-Logo.png'
-        }
+    reset() {
+      this.$refs.form.reset();
+      this.players = [];
     }
-        
-}
+  },
+  data() {
+    return {
+      valid: true,
+      players: [],
+      loading: false,
+      team_url:
+        "https://www.schachbund.de/SchachBL/bedm.php?liga=2bls&nummer=9",
+      logo_url: "http://www.schachfreunde-neuberg.de/SFR-Logo.png"
+    };
+  }
+};
 </script>
 <style>
 @media print {
-    section { 
-        page-break-before:always; 
-    }
+  section {
+    page-break-before: always;
+  }
 
-    .controls {
-        display: none;
-    }
-} 
+  .controls {
+    display: none;
+  }
+}
 </style>
