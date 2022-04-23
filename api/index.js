@@ -21,9 +21,10 @@ app.post('/get-players', async (req, res, next) => {
 
   if (response.status == 200) {
     const html = response.data;
-    const $ = require('cheerio');
+    const cheerio = require('cheerio');
+    const $ = cheerio.load(html);
 
-    $('table.mannschaft > tbody > tr', html).each(function(i, elem) {
+    $('table.mannschaft > tbody > tr').each(function(i, elem) {
       let player = {};
       player.pos = $('.nr', this).text();
       player.name = $('.spieler > a', this).text();

@@ -58,7 +58,7 @@ export default {
       players: [],
       loading: false,
       team_url:
-        "https://www.schachbund.de/SchachBL/bedm.php?liga=2bls&nummer=9",
+        "https://ergebnisdienst.schachbund.de/bedm.php?liga=2blw&nummer=8",
       logo_url: "http://www.schachfreunde-neuberg.de/SFR-Logo.png"
     };
   }
